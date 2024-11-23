@@ -17,7 +17,7 @@ def scrap_website(url):
             if content:
                 return str(content)
             return ""
-            r
+            
         
         
 
