@@ -19,7 +19,7 @@ def parse_with_ollama(dom_chunks,parse_description):
     parsed_results = []
 
     for i,chunk in enumerate(dom_chunks,start=1):
-        response = chain.run(
+        response = chain.invoke(
             {"dom_content":chunk,"parse_description":parse_description}
         )
         print(f"parsed batch {i} of {len(dom_chunks)}")

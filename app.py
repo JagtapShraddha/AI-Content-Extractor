@@ -1,5 +1,5 @@
 import streamlit as st
-from scraper import scrap_website, clean_content,split_dom_content
+from scraper import scrap_website, clean_content,split_dom_content,extract_body_content
 from parse import parse_with_ollama
 
 st.title("AI Web Scraper")
@@ -13,10 +13,11 @@ if st.button("Scrape"):
 
     # Scrape the website using the dynamic scraper
     dom_content = scrap_website(url)
+    body_content = extract_body_content(dom_content)
 
-    if dom_content:
+    if body_content:
         # Clean the scraped content
-        cleaned_content = clean_content(dom_content)
+        cleaned_content = clean_content(body_content)
         
         st.session_state.dom_content = cleaned_content
 
@@ -29,24 +30,14 @@ if st.button("Scrape"):
             parse_description = st.text_area("Describe what you want to parse:")
         
        
-            if st.button("Parse Content"):
+            if st.button("Parse Content") and parse_description:
+                st.write("Parsing the content...")
 
-                if parse_description:
-                    st.write("Parsing the content...")
+                # Split the DOM content into chunks if it's too long
+                dom_chunks = split_dom_content(st.session_state.dom_content)
+                result = parse_with_ollama(dom_chunks,parse_description)
+                st.write(result)
 
-                    # Split the DOM content into chunks if it's too long
-                    dom_chunks = split_dom_content(st.session_state.dom_content)
-
-                    parsed_result = parse_with_ollama(dom_chunks,parse_description)
-                    if parsed_result:
-                        st.write(parsed_result)
-                    else:
-                        st.error("No Matching Content Found")
-
-            else:
-                st.error("Please provide a description of what you want to parse.")
-
-    else:
-        st.error("No data was scraped. Please check the URL.")
+                    
 
 
