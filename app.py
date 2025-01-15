@@ -12,8 +12,8 @@ if st.button("Scrape"):
     st.write("Scraping the website...")
 
     # Scrape the website using the dynamic scraper
-    dom_content = scrap_website(url)
-    body_content = extract_body_content(dom_content)
+    result = scrap_website(url)
+    body_content = extract_body_content(result)
 
     if body_content:
         # Clean the scraped content
@@ -23,20 +23,22 @@ if st.button("Scrape"):
 
        
         st.subheader("Scraped Data:")
-        with st.expander("View DOM Content"):
+        with st.expander("View  Content"):
             st.text_area("DOM Content", cleaned_content, height=300)
         
-        if "dom_content" in st.session_state:    
-            parse_description = st.text_area("Describe what you want to parse:")
+if "dom_content" in st.session_state:    
+    parse_description = st.text_area("Describe what you want to parse:")
         
        
-            if st.button("Parse Content") and parse_description:
-                st.write("Parsing the content...")
+    if st.button("Parse Content"):
 
-                # Split the DOM content into chunks if it's too long
-                dom_chunks = split_dom_content(st.session_state.dom_content)
-                result = parse_with_ollama(dom_chunks,parse_description)
-                st.write(result)
+        if parse_description:
+            st.write("Parsing the content...")
+
+            # Split the DOM content into chunks if it's too long
+            dom_chunks = split_dom_content(st.session_state.dom_content)
+            result = parse_with_ollama(dom_chunks,parse_description)
+            st.write(result)
 
                     
 

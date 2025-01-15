@@ -15,7 +15,6 @@ def scrap_website(url):
         
     try:
         driver.get(url)
-        
         print("page loaded")
         html = driver.page_source
         time.sleep(5)
@@ -84,7 +83,4 @@ def split_dom_content(dom_content, max_length=6000):
     if not dom_content:
         return []
 
-    chunks = [dom_content[i:i + max_length] for i in range(0, len(dom_content), max_length)]
-    for i, chunk in enumerate(chunks):
-        print(f"Chunk {i + 1}: {len(chunk)} characters")
-    return chunks
+    return [dom_content[i:i + max_length] for i in range(0, len(dom_content), max_length)]
