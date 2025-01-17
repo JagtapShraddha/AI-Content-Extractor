@@ -1,27 +1,32 @@
 from langchain_ollama import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate
 
-template = (
-    "You are tasked with extracting specific information from the following text content: {dom_content}. "
-    "Please follow these instructions carefully: \n\n"
-    "1. **Extract Information:** Only extract the information that directly matches the provided description: {parse_description}. "
-    "2. **No Extra Content:** Do not include any additional text, comments, or explanations in your response. "
-    "3. **Empty Response:** If no information matches the description, return an empty string ('')."
-    "4. **Direct Data Only:** Your output should contain only the data that is explicitly requested, with no other text."
+# Template for extracting specific information
+instruction_template = (
+    "You are tasked with extracting specific information from the following content: {dom_content}. "
+    "Follow these instructions carefully: \n\n"
+    "1. **Extract Information:** Only extract data that directly matches this description: {parse_description}. "
+    "2. **No Additional Text:** Exclude any extra comments or explanations. "
+    "3. **Empty Response:** If no match is found, return an empty string ('')."
+    "4. **Direct Response:** Your response should only include the data requested, with no other text."
 )
 
-model = OllamaLLM(model="llama3.2")
+# Initialize the model
+llama_model = OllamaLLM(model="llama3.2")
 
-def parse_with_ollama(dom_chunks,parse_description):
-    prompt = ChatPromptTemplate.from_template(template)
-    chain = prompt | model
+def extract_data_with_ollama(dom_chunks, query_description):
+    # Create a prompt from the template
+    prompt = ChatPromptTemplate.from_template(instruction_template)
+    chain = prompt | llama_model
 
-    parsed_results = []
+    results = []
 
-    for i,chunk in enumerate(dom_chunks,start=1):
-        response = chain.invoke(
-            {"dom_content":chunk,"parse_description":parse_description}
-        )
-        print(f"parsed batch {i} of {len(dom_chunks)}")
-        parsed_results.append(response)
-    return "\n".join(parsed_results)
+    # Process each chunk of the DOM content
+    for index, chunk in enumerate(dom_chunks, start=1):
+        response = chain.invoke({"dom_content": chunk, "parse_description": query_description})
+        print(f"Processing batch {index} of {len(dom_chunks)}")
+        results.append(response)
+    
+    # Combine the results from all chunks
+    return "\n".join(results)
+
