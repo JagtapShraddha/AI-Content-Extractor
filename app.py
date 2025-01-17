@@ -1,45 +1,36 @@
 import streamlit as st
-from scraper import scrap_website, clean_content,split_dom_content,extract_body_content
-from parse import parse_with_ollama
+from scrape import (
+    retrieve_website_content as scrape_site,
+    clean_html_content as cleanse_text,
+    split_text_into_chunks as split_content,
+    get_body_html as get_body_html,
+)
+from parse import extract_data_with_ollama as ollama_parse  # Ensure this is defined elsewhere
 
-st.title("AI Web Scraper")
+st.title("AI-Enhanced Content Scraper")
 
+input_url = st.text_input("Paste the Website URL:")
 
-url = st.text_input("Enter a Website URL:")
+if st.button("Initiate Scraping"):
+    st.write("Processing the website...")
+    page_data = scrape_site(input_url)
 
+    if page_data:
+        body_text = get_body_html(page_data)
+        refined_content = cleanse_text(body_text)
+        st.session_state.refined_content = refined_content
 
-if st.button("Scrape"):
-    st.write("Scraping the website...")
+        st.subheader("Extracted Data:")
+        with st.expander("Click to Reveal Content"):
+            st.text_area("Content from the Web Page", refined_content, height=300)
 
-    # Scrape the website using the dynamic scraper
-    result = scrap_website(url)
-    body_content = extract_body_content(result)
+if "refined_content" in st.session_state:
+    parsing_request = st.text_area("How would you like to process the content?")
 
-    if body_content:
-        # Clean the scraped content
-        cleaned_content = clean_content(body_content)
-        
-        st.session_state.dom_content = cleaned_content
-
-       
-        st.subheader("Scraped Data:")
-        with st.expander("View  Content"):
-            st.text_area("DOM Content", cleaned_content, height=300)
-        
-if "dom_content" in st.session_state:    
-    parse_description = st.text_area("Describe what you want to parse:")
-        
-       
-    if st.button("Parse Content"):
-
-        if parse_description:
-            st.write("Parsing the content...")
-
-            # Split the DOM content into chunks if it's too long
-            dom_chunks = split_dom_content(st.session_state.dom_content)
-            result = parse_with_ollama(dom_chunks,parse_description)
-            st.write(result)
-
-                    
-
+    if st.button("Start Parsing"):
+        if parsing_request:
+            st.write("Parsing content...")
+            content_segments = split_content(st.session_state.refined_content)
+            parsed_output = ollama_parse(content_segments, parsing_request)
+            st.write(parsed_output)
 
