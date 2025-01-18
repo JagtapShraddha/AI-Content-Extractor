@@ -1,86 +1,52 @@
 import requests
-from bs4 import BeautifulSoup
-import selenium.webdriver as webdriver
+from selenium import webdriver as wd
 from selenium.webdriver.chrome.service import Service
+from bs4 import BeautifulSoup
 import time
 
-SCRAPER_API_URL = "http://api.scraperapi.com"
-API_KEY = "27151b483204a4bc441d02205a569fab"
+# API endpoint and key (disabled for now)
+# SCRAPER_API_URL = "http://api.scraperapi.com"
+# API_KEY = "27151b483204a4bc441d02205a569fab"
 
-def scrap_website(url):
-    chrome_driver_path = "./chromedriver"
-    options = webdriver.ChromeOptions()
-    driver = webdriver.Chrome(service = Service(chrome_driver_path),options=options)
-    #response = requests.get(f"{SCRAPER_API_URL}?api_key={API_KEY}&url={url}")
-        
+def retrieve_website_content(url):
+    driver_path = "./chromedriver"
+    chrome_options = wd.ChromeOptions()
+    browser_instance = wd.Chrome(service=Service(driver_path), options=chrome_options)
+
     try:
-        driver.get(url)
-        print("page loaded")
-        html = driver.page_source
+        # Navigate to the webpage
+        browser_instance.get(url)
+        print("Page loaded successfully!")
+        page_source = browser_instance.page_source
         time.sleep(5)
 
-        return html
-    
-        
+        return page_source
 
-        # soup = BeautifulSoup(response.content, 'html.parser')
-        # content = soup.get_text()
-        # # Check if the request was successful
-        # if response.status_code == 200:
-        #     soup = BeautifulSoup(response.content, 'html.parser')
-        #     content = soup.get_text()
-        #     if content:
-        #         return str(content)
-        #     return ""
-            
-        
-        
-
-    except Exception as e:
-        print(f"Error fetching the URL: {e}")
+    except Exception as error:
+        print(f"Error during website retrieval: {error}")
         return None
+
     finally:
-        driver.quit()
+        browser_instance.quit()
 
-def extract_body_content(html_content):
-    soup = BeautifulSoup(html_content, 'html.parser')
-    body_content = soup.body
-    if body_content:
-        return str(body_content)
-    return ""
+def get_body_html(html_page):
+    soup = BeautifulSoup(html_page, 'html.parser')
+    body = soup.body
+    return str(body) if body else ""
 
+def clean_html_content(raw_html):
+    soup = BeautifulSoup(raw_html, 'html.parser')
+    
+    # Remove unwanted tags (script, style)
+    for tag in soup(["script", "style"]):
+        tag.extract()
 
-        
-def clean_content(body_content):
-    soup = BeautifulSoup(body_content,'html.parser')
-    for script_or_style in soup(["script","style"]):
-        script_or_style.extract()
+    # Extract clean text from the page
+    clean_text = soup.get_text(separator="\n")
+    return "\n".join([line.strip() for line in clean_text.splitlines() if line.strip()])
 
-    cleaned_content = soup.get_text(separator = "\n")
-    cleaned_content = "\n".join(
-        line.strip() for line in cleaned_content.splitlines() if line.strip()
-        )
-   
-
-    # # Split the result into lines
-    # lines = result.splitlines()
-    
-    # # List to store cleaned lines
-    # cleaned_lines = []
-    
-    # for line in lines:
-    #     # Strip extra spaces from each line and remove empty lines
-    #     cleaned_line = ' '.join(line.split())
-    #     if cleaned_line:  # Only append non-empty lines
-    #         cleaned_lines.append(cleaned_line)
-    
-    # # Join all the cleaned lines back into a single string with newlines between them
-    # cleaned_content = "\n".join(cleaned_lines)
-    
-    return cleaned_content
-    
-def split_dom_content(dom_content, max_length=6000):
-    if not dom_content:
+def split_text_into_chunks(long_text, chunk_limit=6000):
+    # Break the long text into manageable chunks
+    if not long_text:
         return []
-
-    return [dom_content[i:i + max_length] for i in range(0, len(dom_content), max_length)]
+    return [long_text[i:i + chunk_limit] for i in range(0, len(long_text), chunk_limit)]
