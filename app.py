@@ -5,9 +5,9 @@ from scraper import (
     split_text_into_chunks as split_content,
     get_body_html as get_body_html,
 )
-from parse import extract_data_with_ollama as ollama_parse  # Ensure this is defined elsewhere
+from parse import extract_data_with_ollama as ollama_parse  
 
-st.title("AI-Enhanced Content Scraper")
+st.title("AI Content Scraper")
 
 input_url = st.text_input("Paste the Website URL:")
 
