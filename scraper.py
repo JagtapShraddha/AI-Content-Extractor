@@ -4,7 +4,6 @@ from selenium.webdriver.chrome.service import Service
 from bs4 import BeautifulSoup
 import time
 
-# API endpoint and key (disabled for now)
 # SCRAPER_API_URL = "http://api.scraperapi.com"
 # API_KEY = "27151b483204a4bc441d02205a569fab"
 
