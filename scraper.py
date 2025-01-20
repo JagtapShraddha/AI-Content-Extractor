@@ -1,5 +1,5 @@
 import requests
-from selenium import webdriver as wd
+from selenium import webdriver as wbd
 from selenium.webdriver.chrome.service import Service
 from bs4 import BeautifulSoup
 import time
@@ -10,25 +10,27 @@ import time
 
 def scrapeSite(url):
     driverpath = "./chromedriver"
-    chromeoptions = wd.ChromeOptions()
-    browserinstance = wd.Chrome(service=Service(driverpath)  , options=chromeoptions)
+    chromeoptions = wbd.ChromeOptions()
+    browserinstance = wbd.Chrome(service=Service(driverpath)  , options=chromeoptions)
 
-    try:
-        # Navigate to the webpage
-        browserinstance.get(url)
-        print("Page loaded successfully!")
+    
+        # Open the URL
+    browserinstance.get(url)
+    print("Page loaded successfully!")
 
-        pageSource = browserinstance.page_source
-        time.sleep(5)
+    pageSource = browserinstance.page_source
+    time.sleep(5)
 
-        return pageSource
+    return pageSource
 
-    except Exception as error:
-        print(f"Error during website retrieval:")
-        return None
+    browserinstance.quit()
 
-    finally:
-        browserinstance.quit()
+    # def scrap_website(url):
+    
+    #     response = requests.get(url)
+    #     response.raise_for_status()  
+    #     soup = BeautifulSoup(response.content, 'html.parser')
+    #     content = soup.get_text()
 
 def getBody(html_page):
     soup = BeautifulSoup(html_page, 'html.parser')
@@ -50,6 +52,6 @@ def cleanseText(rawHtml):
 
 def splitContent(long_text, chunk_limit=6000):
    
-    #if not long_text:
-    #    return []
+    if not long_text:
+        return []
     return [long_text[i:i + chunk_limit] for i in range(0, len(long_text), chunk_limit)]
