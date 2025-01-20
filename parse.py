@@ -16,7 +16,7 @@ instruction_template = (
 llama_model = OllamaLLM(model="llama3.2")
 prompt = ChatPromptTemplate.from_template(instruction_template)
 
-def extract_data_with_ollama(dom_chunks, query_description):
+def extractData(dom_chunks, query_description):
     chain = prompt | llama_model
 
     def process_chunk(chunk):
