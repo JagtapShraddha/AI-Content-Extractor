@@ -31,5 +31,4 @@ def extractData(dom_chunks, query_description):
     with ThreadPoolExecutor() as executor:
         results = list(executor.map(process_chunk, dom_chunks))
 
-    # Combine the results
     return "\n".join(results)
