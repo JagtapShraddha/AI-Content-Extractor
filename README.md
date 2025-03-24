@@ -11,7 +11,7 @@ This project is an **AI-powered web content extractor** that utilizes **LangChai
 ## **🛠️ Installation**
 ### **1️⃣ Prerequisites**
 Ensure you have the following installed:
-- **Python 3.8+**
+- **Python 3**
 - **Ollama** (to run LLMs locally)
 - **LangChain**
 - **BeautifulSoup** (for HTML parsing)
